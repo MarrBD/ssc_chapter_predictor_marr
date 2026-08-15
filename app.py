@@ -256,7 +256,7 @@ elif page == "🔐 Admin":
                         reject_comment(idx)
                         st.rerun()
                     st.divider()
-        except Exception as e:
-            st.error(f"সমস্যা: {e}")
+       except Exception as e:
+                    st.exception(e)
     elif pw:
         st.error("❌ ভুল পাসওয়ার্ড")

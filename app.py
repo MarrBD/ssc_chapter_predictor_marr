@@ -28,39 +28,87 @@ st.set_page_config(page_title="Chapter Importance Predictor", page_icon="📊", 
 
 st.markdown("""
 <style>
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+@keyframes floatDots {
+    0%, 100% { transform: translateY(0px); opacity: 0.6; }
+    50% { transform: translateY(-15px); opacity: 1; }
+}
 .stApp {
-    background-color: #0b0e14;
+    background-color: #0a0d16;
     background-image:
-        radial-gradient(circle at 10% 15%, rgba(76,155,232,0.18) 0%, transparent 30%),
-        radial-gradient(circle at 90% 10%, rgba(95,201,141,0.15) 0%, transparent 30%),
-        radial-gradient(circle at 30% 80%, rgba(142,111,224,0.15) 0%, transparent 35%),
-        radial-gradient(circle at 80% 75%, rgba(242,166,90,0.12) 0%, transparent 30%),
-        radial-gradient(1px 1px at 20px 30px, rgba(255,255,255,0.25) 100%, transparent),
-        radial-gradient(1px 1px at 120px 90px, rgba(255,255,255,0.2) 100%, transparent),
-        radial-gradient(1px 1px at 250px 50px, rgba(255,255,255,0.25) 100%, transparent),
-        radial-gradient(1px 1px at 400px 200px, rgba(255,255,255,0.2) 100%, transparent),
-        linear-gradient(135deg, #0b0e14 0%, #10141f 100%);
-    background-size: cover, cover, cover, cover, 300px 300px, 300px 300px, 300px 300px, 300px 300px, cover;
+        radial-gradient(circle at 15% 20%, rgba(76,155,232,0.30) 0%, transparent 32%),
+        radial-gradient(circle at 88% 12%, rgba(95,201,141,0.25) 0%, transparent 32%),
+        radial-gradient(circle at 25% 85%, rgba(142,111,224,0.28) 0%, transparent 38%),
+        radial-gradient(circle at 82% 78%, rgba(242,166,90,0.22) 0%, transparent 32%),
+        radial-gradient(circle at 55% 45%, rgba(232,108,108,0.15) 0%, transparent 40%),
+        linear-gradient(120deg, #0a0d16 0%, #131a2b 30%, #0d1420 60%, #141020 100%);
+    background-size: 200% 200%, 200% 200%, 200% 200%, 200% 200%, 200% 200%, 400% 400%;
+    animation: gradientShift 18s ease infinite;
     background-attachment: fixed;
 }
-.block-container { padding-top: 2rem; }
+.stApp::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image:
+        radial-gradient(2px 2px at 10% 15%, rgba(255,255,255,0.9) 100%, transparent),
+        radial-gradient(2px 2px at 25% 45%, rgba(120,200,255,0.8) 100%, transparent),
+        radial-gradient(1.5px 1.5px at 40% 20%, rgba(255,255,255,0.7) 100%, transparent),
+        radial-gradient(2px 2px at 60% 70%, rgba(150,255,180,0.8) 100%, transparent),
+        radial-gradient(1.5px 1.5px at 75% 30%, rgba(255,255,255,0.7) 100%, transparent),
+        radial-gradient(2px 2px at 85% 60%, rgba(255,200,120,0.8) 100%, transparent),
+        radial-gradient(1.5px 1.5px at 92% 85%, rgba(255,255,255,0.6) 100%, transparent),
+        radial-gradient(2px 2px at 50% 90%, rgba(200,150,255,0.8) 100%, transparent);
+    background-size: 100% 100%;
+    animation: floatDots 8s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+.block-container { padding-top: 2rem; position: relative; z-index: 1; }
+
+h1 {
+    background: linear-gradient(90deg, #4C9BE8, #8E6FE0, #5FC98D);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 800 !important;
+}
+
 .chapter-card {
-    background: rgba(255,255,255,0.05);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
     border-left: 5px solid var(--accent);
-    border-radius: 8px;
-    padding: 14px 18px;
-    margin-bottom: 10px;
-    backdrop-filter: blur(2px);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    transition: transform 0.2s ease;
+}
+.chapter-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.35);
 }
 .comment-card {
-    background: rgba(255,255,255,0.05);
-    border-radius: 8px;
-    padding: 12px 16px;
-    margin-bottom: 8px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    backdrop-filter: blur(8px);
+}
+
+section[data-testid="stSidebar"] {
+    background: rgba(10,13,22,0.85);
+    backdrop-filter: blur(10px);
+    border-right: 1px solid rgba(255,255,255,0.06);
 }
 </style>
 """, unsafe_allow_html=True)
-
 # ================== Google Sheets Connection ==================
 @st.cache_resource
 def get_gsheet():
@@ -132,7 +180,7 @@ df["adjusted_importance"] = np.clip(df["predicted_importance"] + (adjustment_dir
 # ================== PAGE: Predictor ==================
 if page == "🏠 Predictor":
     st.title("📊 SSC Chapter Importance Predictor")
-    st.caption("MARR (230321059) | EUB, CSE, Batch 26 | ML Course Project")
+    st.caption("MARR | EUB, CSE, Batch 26 | ML Course Project")
 
     subject_df = df[df["subject"] == subject].sort_values("adjusted_importance", ascending=False).head(top_n)
     accent = SUBJECT_COLORS.get(subject, "#4C9BE8")
@@ -200,15 +248,17 @@ elif page == "⭐ Rate This App":
         comment = st.text_area("মন্তব্য")
         submitted = st.form_submit_button("জমা দিন")
         if submitted:
-            if name.strip() and comment.strip():
-                try:
-                    add_comment(name.strip(), rating, comment.strip())
-                    st.success("✅ ধন্যবাদ! আপনার মতামত জমা হয়েছে, admin approve করলে এটা publicly দেখা যাবে।")
-                    st.balloons()
-                except Exception as e:
-                    st.exception(e)
-            else:
-                st.warning("নাম ও মন্তব্য দুটোই দিন।")
+    if name.strip() and comment.strip():
+        try:
+            with st.spinner("জমা হচ্ছে..."):
+                add_comment(name.strip(), rating, comment.strip())
+            st.success("✅ ধন্যবাদ! আপনার মতামত জমা হয়েছে, admin approve করলে এটা publicly দেখা যাবে।")
+            st.balloons()
+            st.toast("রিভিউ সফলভাবে জমা হয়েছে!", icon="🎉")
+        except Exception as e:
+            st.exception(e)
+    else:
+        st.warning("নাম ও মন্তব্য দুটোই দিন।")
 
 # ================== PAGE: About ==================
 elif page == "ℹ️ About":
@@ -224,7 +274,7 @@ elif page == "ℹ️ About":
         **Department:** CSE, European University of Bangladesh (EUB), Batch 26 — 9th Semester
         **Course:** Machine Learning
         **Course Coordinator:** Mohammad Mehadi Hasan, Assistant Professor, CSE, EUB
-        **Data Entry সহায়তা:** Abidur Rahman, Tuly, Mainuddin
+        **Data Entry সহায়তা:** Also my teammate: Abidur Rahman, Tuly, Mainuddin
         """)
     st.divider()
     st.subheader("📦 Dataset Summary")

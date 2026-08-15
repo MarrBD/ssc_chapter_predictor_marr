@@ -197,7 +197,7 @@ elif page == "⭐ Rate This App":
                     add_comment(name.strip(), rating, comment.strip())
                     st.success("✅ ধন্যবাদ! আপনার মতামত জমা হয়েছে, admin approve করলে এটা publicly দেখা যাবে।")
                 except Exception as e:
-                    st.error(f"সমস্যা হয়েছে: {e}")
+                    st.exception(e)
             else:
                 st.warning("নাম ও মন্তব্য দুটোই দিন।")
 

@@ -248,17 +248,17 @@ elif page == "⭐ Rate This App":
         comment = st.text_area("মন্তব্য")
         submitted = st.form_submit_button("জমা দিন")
         if submitted:
-    if name.strip() and comment.strip():
-        try:
-            with st.spinner("জমা হচ্ছে..."):
+            if name.strip() and comment.strip():
+            try:
+                with st.spinner("জমা হচ্ছে..."):
                 add_comment(name.strip(), rating, comment.strip())
-            st.success("✅ ধন্যবাদ! আপনার মতামত জমা হয়েছে, admin approve করলে এটা publicly দেখা যাবে।")
-            st.balloons()
-            st.toast("রিভিউ সফলভাবে জমা হয়েছে!", icon="🎉")
-        except Exception as e:
-            st.exception(e)
-    else:
-        st.warning("নাম ও মন্তব্য দুটোই দিন।")
+                st.success("✅ ধন্যবাদ! আপনার মতামত জমা হয়েছে, admin approve করলে এটা publicly দেখা যাবে।")
+                st.balloons()
+                st.toast("রিভিউ সফলভাবে জমা হয়েছে!", icon="🎉")
+            except Exception as e:
+                st.exception(e)
+        else:
+                st.warning("নাম ও মন্তব্য দুটোই দিন।")
 
 # ================== PAGE: About ==================
 elif page == "ℹ️ About":

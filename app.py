@@ -29,23 +29,31 @@ st.set_page_config(page_title="Chapter Importance Predictor", page_icon="📊", 
 st.markdown("""
 <style>
 .stApp {
-    background:
-        radial-gradient(circle at 15% 20%, rgba(76,155,232,0.15) 0%, transparent 35%),
-        radial-gradient(circle at 85% 10%, rgba(95,201,141,0.12) 0%, transparent 35%),
-        radial-gradient(circle at 50% 85%, rgba(142,111,224,0.12) 0%, transparent 40%),
-        linear-gradient(135deg, #0e1117 0%, #131722 100%);
+    background-color: #0b0e14;
+    background-image:
+        radial-gradient(circle at 10% 15%, rgba(76,155,232,0.18) 0%, transparent 30%),
+        radial-gradient(circle at 90% 10%, rgba(95,201,141,0.15) 0%, transparent 30%),
+        radial-gradient(circle at 30% 80%, rgba(142,111,224,0.15) 0%, transparent 35%),
+        radial-gradient(circle at 80% 75%, rgba(242,166,90,0.12) 0%, transparent 30%),
+        radial-gradient(1px 1px at 20px 30px, rgba(255,255,255,0.25) 100%, transparent),
+        radial-gradient(1px 1px at 120px 90px, rgba(255,255,255,0.2) 100%, transparent),
+        radial-gradient(1px 1px at 250px 50px, rgba(255,255,255,0.25) 100%, transparent),
+        radial-gradient(1px 1px at 400px 200px, rgba(255,255,255,0.2) 100%, transparent),
+        linear-gradient(135deg, #0b0e14 0%, #10141f 100%);
+    background-size: cover, cover, cover, cover, 300px 300px, 300px 300px, 300px 300px, 300px 300px, cover;
     background-attachment: fixed;
 }
 .block-container { padding-top: 2rem; }
 .chapter-card {
-    background: rgba(255,255,255,0.04);
+    background: rgba(255,255,255,0.05);
     border-left: 5px solid var(--accent);
     border-radius: 8px;
     padding: 14px 18px;
     margin-bottom: 10px;
+    backdrop-filter: blur(2px);
 }
 .comment-card {
-    background: rgba(255,255,255,0.04);
+    background: rgba(255,255,255,0.05);
     border-radius: 8px;
     padding: 12px 16px;
     margin-bottom: 8px;
@@ -196,6 +204,7 @@ elif page == "⭐ Rate This App":
                 try:
                     add_comment(name.strip(), rating, comment.strip())
                     st.success("✅ ধন্যবাদ! আপনার মতামত জমা হয়েছে, admin approve করলে এটা publicly দেখা যাবে।")
+                    st.balloons()
                 except Exception as e:
                     st.exception(e)
             else:

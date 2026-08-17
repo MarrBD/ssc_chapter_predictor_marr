@@ -12,7 +12,7 @@ LEVELS = {
     "SSC": {
         "active": True,
         "model_path": "ssc_chapter_importance_model.pkl",
-        "data_path": "ssc_chapters_data.csv",
+        "data_path": "ssc_chapters_data_with_tiers.csv",
     },
     "HSC": {"active": False},
     "Admission (ভর্তি পরীক্ষা)": {"active": False},
@@ -22,6 +22,12 @@ LEVELS = {
 SUBJECT_COLORS = {
     "Math": "#4C9BE8", "Higher Math": "#8E6FE0", "Physics": "#F2A65A",
     "Chemistry": "#5FC98D", "Biology": "#E86C6C",
+}
+
+TIER_COLORS = {
+    "High Priority": "#E86C6C",
+    "Medium Priority": "#F2A65A",
+    "Low Priority": "#5FC98D",
 }
 
 st.set_page_config(page_title="Chapter Importance Predictor", page_icon="📊", layout="wide")
@@ -188,9 +194,12 @@ if page == "🏠 Predictor":
     st.subheader(f"{subject} — {target_year} সালের জন্য সবচেয়ে গুরুত্বপূর্ণ {top_n}টি Chapter")
 
     for i, row in enumerate(subject_df.itertuples(), 1):
+        tier = getattr(row, "priority_tier", "N/A")
+        tier_color = TIER_COLORS.get(tier, "#888")
         st.markdown(f"""
         <div class="chapter-card" style="--accent:{accent};">
-            <b>{i}. Chapter {row.chapter_no}: {row.chapter_name_en}</b> ({row.chapter_name_bn})<br>
+            <b>{i}. Chapter {row.chapter_no}: {row.chapter_name_en}</b> ({row.chapter_name_bn})
+            <span style="background:{tier_color}; color:#fff; padding:2px 10px; border-radius:12px; font-size:0.75em; margin-left:8px;">{tier}</span><br>
             <span style="color:{accent}; font-size:1.1em; font-weight:bold;">Score: {row.adjusted_importance:.1f}/100</span>
         </div>
         """, unsafe_allow_html=True)
@@ -198,10 +207,15 @@ if page == "🏠 Predictor":
 
     st.divider()
     st.subheader("বিস্তারিত টেবিল")
+    display_cols = ["chapter_no","chapter_name_en","chapter_name_bn","predicted_importance","adjusted_importance"]
+    rename_map = {"chapter_no":"Ch#","chapter_name_en":"Chapter (EN)","chapter_name_bn":"Chapter (BN)",
+                  "predicted_importance":"Base Score","adjusted_importance":f"Adjusted Score ({target_year})"}
+    if "priority_tier" in subject_df.columns:
+        display_cols.append("priority_tier")
+        rename_map["priority_tier"] = "Priority"
+
     st.dataframe(
-        subject_df[["chapter_no","chapter_name_en","chapter_name_bn","predicted_importance","adjusted_importance"]]
-        .rename(columns={"chapter_no":"Ch#","chapter_name_en":"Chapter (EN)","chapter_name_bn":"Chapter (BN)",
-                          "predicted_importance":"Base Score","adjusted_importance":f"Adjusted Score ({target_year})"}),
+        subject_df[display_cols].rename(columns=rename_map),
         use_container_width=True, hide_index=True
     )
 
@@ -218,6 +232,24 @@ if page == "🏠 Predictor":
                           color="adjusted_importance", color_continuous_scale="Blues")
         fig_bar.update_layout(yaxis_title="", xaxis_title="Importance Score")
         st.plotly_chart(fig_bar, use_container_width=True)
+
+    if "priority_tier" in subject_df.columns:
+        st.markdown("")
+        tier_counts = subject_df["priority_tier"].value_counts().reindex(
+            ["High Priority", "Medium Priority", "Low Priority"]
+        ).fillna(0).reset_index()
+        tier_counts.columns = ["Priority", "Count"]
+
+        fig_tier = px.bar(
+            tier_counts, x="Priority", y="Count",
+            title=f"{subject} — Priority Tier Distribution (Top {top_n})",
+            color="Priority",
+            color_discrete_map=TIER_COLORS,
+            text="Count"
+        )
+        fig_tier.update_traces(textposition="outside")
+        fig_tier.update_layout(showlegend=False, yaxis_title="Chapter সংখ্যা", xaxis_title="")
+        st.plotly_chart(fig_tier, use_container_width=True)
 
     st.divider()
     st.subheader("💬 User Reviews")
